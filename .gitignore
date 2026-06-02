@@ -1,0 +1,25 @@
+# Build folders
+Builds/
+build/
+
+# JUCE generated code
+JuceLibraryCode/
+
+# Compiled objects
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.exe
+
+# OS stuff
+.DS_Store
+Thumbs.db
+
+# VSCode (optional)
+.vscode/
+
+# Logs
+*.log
