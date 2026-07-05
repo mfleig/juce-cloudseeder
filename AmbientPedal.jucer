@@ -6,6 +6,8 @@
     <GROUP id="{679B276E-3C50-B170-5CEA-2C5AAE23EC13}" name="Source">
       <FILE id="w3gH82" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="RWIBQI" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="u5jCfK" name="DelayEffect.h" compile="0" resource="0" file="Source/DelayEffect.h"/>
+      <FILE id="LggP4y" name="DelayEffect.cpp" compile="1" resource="0" file="Source/DelayEffect.cpp"/>
       <FILE id="O1uVGS" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>

@@ -1,111 +1,119 @@
 #include "MainComponent.h"
 
 //==============================================================================
+// Constructor: runs when your app starts
 MainComponent::MainComponent()
-    : deviceSelector (deviceManager,
-                      0, 2,   // min/max inputs
-                      0, 2,   // min/max outputs
-                      true,   // show MIDI input
-                      true,   // show MIDI output
-                      true,   // show channels
-                      false)  // hide advanced
+// deviceSelector is a JUCE UI component that lets you choose audio input/output devices
+: deviceSelector (deviceManager,
+0, 2,   // min/max input channels
+0, 2,   // min/max output channels
+false,   // show MIDI input options
+false,   // show MIDI output options
+true,   // show audio channels
+false)  // hide advanced settings
 {
-    setSize (600, 400);
+// Set window size
+setSize (600, 400);
 
-    setAudioChannels (2, 2);
+// Initialize audio system:
+// (inputs, outputs)
+// This tells JUCE: "I want 2 inputs and 2 outputs"
+setAudioChannels (2, 2);
 
-    addAndMakeVisible (deviceSelector);
-    addAndMakeVisible(toggleButton);
+// Add UI components to the window so they are visible
+addAndMakeVisible (deviceSelector);
+addAndMakeVisible (toggleButton);
 
-    toggleButton.onClick = [this]()
-    {
-        delayEnabled = !delayEnabled;
+// Define what happens when button is clicked
+toggleButton.onClick = [this]()
+{
+    // Toggle current state of delay effect
+    bool enabled = !delay.isActive();
 
-        toggleButton.setButtonText(delayEnabled ? "Delay ON" : "Delay OFF");
-    };
+    // Enable/disable delay DSP
+    delay.setEnabled(enabled);
+
+    // Update button label based on state
+    toggleButton.setButtonText(enabled ? "Delay ON" : "Delay OFF");
+};
+
 }
 
+// Destructor: runs when app closes
 MainComponent::~MainComponent()
 {
-    shutdownAudio(); // 🧹 clean up audio
+// Properly shut down audio device
+shutdownAudio();
 }
 
 //==============================================================================
-// 🎧 AUDIO CALLBACKS
+// 🎧 AUDIO CALLBACKS (core of DSP flow)
 
+// Called BEFORE audio starts
+// This is where you initialize buffers, sample rate dependent stuff, etc.
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    int delayBufferSize = (int) sampleRate * 2; // 2 seconds max delay
-
-    delayBuffer.setSize (2, delayBufferSize);
-    delayBuffer.clear();
-
-    delayWritePosition = 0;
+// Forward preparation to your DelayEffect
+// sampleRate = how many samples per second (e.g. 44100)
+// samplesPerBlockExpected = chunk size JUCE processes each callback
+delay.prepare(sampleRate, samplesPerBlockExpected);
 }
 
+// Called when audio stops
 void MainComponent::releaseResources()
 {
-    // Called when audio stops
+// Not used now, but good place to free memory if needed
 }
 
+// 🔥 REAL-TIME AUDIO PROCESSING
+// This runs MANY times per second (audio thread)
+// DO NOT block or do heavy work here
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    auto* buffer = bufferToFill.buffer;
+// Get pointer to audio buffer (this contains incoming guitar signal)
+auto* buffer = bufferToFill.buffer;
 
-    int delayBufferSize = delayBuffer.getNumSamples();
+// Loop through each audio channel (usually 2 = stereo)
+for (int channel = 0; channel < buffer->getNumChannels(); ++channel)
+{
+    // Get pointer to raw float samples for this channel
+    // startSample ensures we process correct region of buffer
+    auto* channelData = buffer->getWritePointer(channel, bufferToFill.startSample);
 
-    int delaySamples = 22050; // ~0.5 sec delay (assuming 44.1kHz)
+    // Send audio data to your DelayEffect
+    // This modifies the signal IN PLACE
+    delay.process(channelData, bufferToFill.numSamples, channel);
+}
 
-    for (int channel = 0; channel < buffer->getNumChannels(); ++channel)
-    {
-        auto* channelData = buffer->getWritePointer(channel, bufferToFill.startSample);
-        auto* delayData = delayBuffer.getWritePointer(channel);
-
-        int writePosition = delayWritePosition;
-
-        for (int i = 0; i < bufferToFill.numSamples; ++i)
-        {
-            int readPosition = (writePosition + delayBufferSize - delaySamples) % delayBufferSize;
-
-            float delayedSample = delayData[readPosition];
-
-            float inputSample = channelData[i];
-
-            // Mix dry + wet
-            if (delayEnabled)
-                channelData[i] = inputSample + delayedSample * 0.5f;
-            else
-                channelData[i] = inputSample;
-
-            // Write into delay buffer
-            delayData[writePosition] = inputSample;
-
-            writePosition++;
-            if (writePosition >= delayBufferSize)
-                writePosition = 0;
-        }
-    }
-
-    delayWritePosition += bufferToFill.numSamples;
-    delayWritePosition %= delayBufferSize;
 }
 
 //==============================================================================
+// 🎨 GUI DRAWING
+
 void MainComponent::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+// Fill background with default UI color
+g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    g.setFont (juce::FontOptions (16.0f));
-    g.setColour (juce::Colours::white);
-    g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
+// Set font size
+g.setFont (juce::FontOptions (16.0f));
+
+// Set text color
+g.setColour (juce::Colours::white);
+
+// Draw centered text
+g.drawText ("Martin's Cloud Seeder", getLocalBounds(), juce::Justification::centred, true);
+
 }
 
+// Called whenever window is resized
 void MainComponent::resized()
 {
-    // This is called when the MainComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
-    deviceSelector.setBounds (getLocalBounds());
-    toggleButton.setBounds(10, getHeight() - 40, 120, 30);
+// Make device selector fill whole window
+deviceSelector.setBounds (getLocalBounds());
+
+// Position toggle button at bottom-left
+toggleButton.setBounds(10, getHeight() - 40, 120, 30);
+
+
 }

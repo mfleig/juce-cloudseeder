@@ -1,36 +1,77 @@
 #pragma once
+// Prevents this header from being included multiple times (avoids duplicate definitions)
 
 #include <JuceHeader.h>
+// Includes all JUCE core modules (audio, GUI, utilities, etc.)
+
+#include "DelayEffect.h"
+// Include your custom DSP effect (your delay implementation)
 
 //==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
+// MainComponent is your main UI + audio processing class
+// It inherits from AudioAppComponent, which:
+// - Handles audio device setup
+// - Provides audio callbacks (prepareToPlay, getNextAudioBlock)
 class MainComponent  : public juce::AudioAppComponent
 {
 public:
-    //==============================================================================
-    MainComponent();
-    ~MainComponent() override;
+// Constructor (runs when app starts)
+MainComponent();
 
-    void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
-    void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override;
-    void releaseResources() override;
+// Destructor (runs when app closes)
+~MainComponent() override;
 
-    //==============================================================================
-    void paint (juce::Graphics&) override;
-    void resized() override;
+//==============================================================================
+
+// Called before audio starts
+// Used to initialize buffers, sample rate-dependent variables, etc.
+void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
+
+// Called repeatedly in real-time (audio thread)
+// This is where audio processing happens
+void getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill) override;
+
+// Called when audio stops
+// Used to release resources (not needed yet in your case)
+void releaseResources() override;
+
+//==============================================================================
+
+// GUI drawing function
+void paint (juce::Graphics&) override;
+
+// Called when window is resized
+void resized() override;
 
 private:
-    //==============================================================================
-    // Your private member variables go here...
+//==============================================================================
 
+// JUCE macro:
+// - Prevents copying of this class (important for audio safety)
+// - Adds leak detection (helps debug memory issues)
+JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
-    juce::AudioDeviceSelectorComponent deviceSelector;
-    juce::AudioBuffer<float> delayBuffer;
-    int delayWritePosition = 0;
-    juce::TextButton toggleButton { "Delay ON" };
-    bool delayEnabled = true;
+//===========================
+// 🎛️ UI COMPONENTS
+//===========================
+
+// Audio device selector UI
+// Lets user choose:
+// - input device (your Zoom)
+// - output device (speakers)
+// - buffer size, sample rate, etc.
+juce::AudioDeviceSelectorComponent deviceSelector;
+
+// Button to toggle delay ON/OFF
+juce::TextButton toggleButton { "Delay ON" };
+
+//===========================
+// 🎸 AUDIO EFFECTS
+//===========================
+
+// Your delay DSP object
+// This is where audio processing logic lives
+// (separate from UI — very important design decision)
+DelayEffect delay;
+
 };
