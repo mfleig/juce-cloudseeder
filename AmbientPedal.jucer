@@ -3,14 +3,16 @@
 <JUCERPROJECT id="BO6eoc" name="AmbientPedal" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="sPDmSA" name="AmbientPedal">
-    <GROUP id="{679B276E-3C50-B170-5CEA-2C5AAE23EC13}" name="Source">
-      <FILE id="w3gH82" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="RWIBQI" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
-      <FILE id="u5jCfK" name="DelayEffect.h" compile="0" resource="0" file="Source/DelayEffect.h"/>
-      <FILE id="LggP4y" name="DelayEffect.cpp" compile="1" resource="0" file="Source/DelayEffect.cpp"/>
-      <FILE id="O1uVGS" name="MainComponent.cpp" compile="1" resource="0"
-            file="Source/MainComponent.cpp"/>
-    </GROUP>
+    <GROUP id="{679B276E-3C50-B170-5CEA-2C5AAE23EC13}" name="Source"/>
+    <FILE id="QRcqqk" name="AudioEngine.h" compile="0" resource="0" file="Source/Audio/AudioEngine.h"/>
+    <FILE id="EYCZI3" name="DelayEffect.cpp" compile="1" resource="0" file="Source/Effects/Delay/DelayEffect.cpp"/>
+    <FILE id="aKn7BO" name="DelayEffect.h" compile="0" resource="0" file="Source/Effects/Delay/DelayEffect.h"/>
+    <FILE id="RlWnmb" name="Effect.h" compile="0" resource="0" file="Source/Effects/Effect.h"/>
+    <FILE id="rZtsEs" name="EffectChain.h" compile="0" resource="0" file="Source/Audio/EffectChain.h"/>
+    <FILE id="POoEnA" name="Main.cpp" compile="1" resource="0" file="Source/App/Main.cpp"/>
+    <FILE id="nT6urF" name="MainComponent.cpp" compile="1" resource="0"
+          file="Source/App/MainComponent.cpp"/>
+    <FILE id="W2hAq5" name="MainComponent.h" compile="0" resource="0" file="Source/App/MainComponent.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

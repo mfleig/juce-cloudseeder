@@ -1,4 +1,4 @@
-#include "DelayEffect.h"
+#include "./DelayEffect.h"
 
 //==============================================================================
 // Called once before audio processing starts

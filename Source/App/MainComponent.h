@@ -4,7 +4,8 @@
 #include <JuceHeader.h>
 // Includes all JUCE core modules (audio, GUI, utilities, etc.)
 
-#include "DelayEffect.h"
+#include "../Audio/EffectChain.h"
+#include "../Effects/Delay/DelayEffect.h"
 // Include your custom DSP effect (your delay implementation)
 
 //==============================================================================
@@ -69,9 +70,8 @@ juce::TextButton toggleButton { "Delay ON" };
 // 🎸 AUDIO EFFECTS
 //===========================
 
-// Your delay DSP object
+// Your Effects Chain DSP object
 // This is where audio processing logic lives
 // (separate from UI — very important design decision)
-DelayEffect delay;
-
+EffectChain effectChain;
 };
