@@ -7,7 +7,7 @@
 */
 
 #include <JuceHeader.h>
-#include "MainComponent.h"
+#include "./MainComponent.h"
 
 //==============================================================================
 class AmbientPedalApplication  : public juce::JUCEApplication

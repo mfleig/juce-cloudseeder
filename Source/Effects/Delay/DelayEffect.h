@@ -4,7 +4,7 @@
 #include <JuceHeader.h>
 // Gives access to JUCE audio classes (AudioBuffer, etc.)
 
-#include "Effect.h"
+#include "../Effect.h"
 // Import base class (our DSP interface)
 
 //==============================================================================

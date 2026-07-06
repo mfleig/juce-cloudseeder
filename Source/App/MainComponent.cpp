@@ -15,6 +15,10 @@ false)  // hide advanced settings
 // Set window size
 setSize (600, 400);
 
+effectChain.addEffect(
+    std::make_unique<DelayEffect>()
+);
+
 // Initialize audio system:
 // (inputs, outputs)
 // This tells JUCE: "I want 2 inputs and 2 outputs"
@@ -27,16 +31,19 @@ addAndMakeVisible (toggleButton);
 // Define what happens when button is clicked
 toggleButton.onClick = [this]()
 {
-    // Toggle current state of delay effect
-    bool enabled = !delay.isActive();
+    auto* effect = effectChain.getEffect(0);
 
-    // Enable/disable delay DSP
-    delay.setEnabled(enabled);
+    if (effect == nullptr)
+    {
+        std::cout << "Effect not found!" << std::endl;
+        return;
+    }
 
-    // Update button label based on state
+    bool enabled = !effect->isActive();
+    effect->setEnabled(enabled);
+
     toggleButton.setButtonText(enabled ? "Delay ON" : "Delay OFF");
 };
-
 }
 
 // Destructor: runs when app closes
@@ -53,10 +60,10 @@ shutdownAudio();
 // This is where you initialize buffers, sample rate dependent stuff, etc.
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-// Forward preparation to your DelayEffect
+// Forward preparation to your Effect Chain
 // sampleRate = how many samples per second (e.g. 44100)
 // samplesPerBlockExpected = chunk size JUCE processes each callback
-delay.prepare(sampleRate, samplesPerBlockExpected);
+effectChain.prepare(sampleRate, samplesPerBlockExpected);
 }
 
 // Called when audio stops
@@ -80,9 +87,9 @@ for (int channel = 0; channel < buffer->getNumChannels(); ++channel)
     // startSample ensures we process correct region of buffer
     auto* channelData = buffer->getWritePointer(channel, bufferToFill.startSample);
 
-    // Send audio data to your DelayEffect
+    // Send audio data to your Effect chain
     // This modifies the signal IN PLACE
-    delay.process(channelData, bufferToFill.numSamples, channel);
+    effectChain.process(channelData, bufferToFill.numSamples, channel);
 }
 
 }
